@@ -1,0 +1,45 @@
+--Shipment_Date = (New Column)
+RELATED(Orders[Order_Date]) + Shipments[Delay_Days]
+
+
+-- High-Risk Suppliers Filter (New Table)
+HighRiskSuppliers = FILTER(Suppliers, Suppliers[Risk_Score] > 80 && Suppliers[Reliability_Rating] < 3
+
+--Delayed Shipments (Last 6 Months) (New Measure)
+Delayed_Shipment = CALCULATE(COUNTROWS(Shipments),Shipments[Status] = "Delayed", DATESINPERIOD(Shipments[Shipment_Date],MAX(Shipments[Shipment_Date]), -6, MONTH))
+
+Delayed Shipments = COUNTROWS(FILTER(Shipments, Shipments[Status] = "Delayed"))
+
+LateShipmentsPct = DIVIDE(CALCULATE(COUNTROWS(Shipments), Shipments[Status] = "Delayed"),COUNTROWS(Shipments))
+
+On Time Shipment % = [On Time Shipments]/COUNTROWS(Shipments)
+
+On Time Shipments = COUNTROWS(FILTER(Shipments, Shipments[Status] = "On Time"))
+
+Total Freight Cost = SUM(Shipments[Freight_Cost])
+
+Total Shipments = COUNTROWS(Shipments)
+
+Average_ReturnCost = AVERAGE(Returns[Cost])
+
+Avg Freight Cost = AVERAGE(Shipments[Freight_Cost])
+
+Avg Delay Days = AVERAGE(Shipments[Delay_Days])
+
+Avg Reliability Rating = AVERAGE(Suppliers[Reliability_Rating])
+
+Avg Risk Score = AVERAGE(Suppliers[Risk_Score])
+
+HighRiskSupplierCount = CALCULATE(COUNTROWS (Suppliers), Suppliers[reliability_rating] < 3, Suppliers[risk_score] > 80)
+
+Total No. of Suppliers = COUNTROWS(Suppliers)
+
+Stock Status = IF(Warehouses[Stock_Level] < Warehouses[Min_Threshold], "Understocked", "Healthy")
+
+Healthy Warehouses = COUNTROWS(FILTER(Warehouses,Warehouses[Stock Status] = "Healthy"))
+
+Under_Stock Warehouses = COUNTROWS(FILTER(Warehouses,Warehouses[Stock Status] = "Understocked"))
+
+ShortageRate = DIVIDE(CALCULATE(COUNTROWS(Warehouses), Warehouses[Stock_Level] < Warehouses[Min_Threshold]), COUNTROWS(Warehouses))
+
+Low Stock Flag = IF ( Warehouses[Stock_Level] < Warehouses[Min_Threshold], "Low", "OK" )
